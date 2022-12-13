@@ -177,4 +177,12 @@ impl PeerMap {
     pub(crate) async fn is_in_memory(&self, id: &str) -> bool {
         self.map.read().await.contains_key(id)
     }
+
+    #[inline]
+    pub(crate) async fn is_allow_peer_relay(&self, own_id: &str) -> bool {
+        if let Ok(exists) = self.db.exists_relay_allow_list(own_id).await {
+           return exists;
+        }
+        false
+    }
 }

@@ -402,7 +402,18 @@ impl RendezvousServer {
                     socket.send(&msg_out, addr).await?
                 }
                 Some(rendezvous_message::Union::PunchHoleRequest(ph)) => {
-                    if self.pm.is_in_memory(&ph.id).await {
+                    // check id blacklist
+                    if !self.handle_check_allow_id_relay(ph.clone()).await {
+                        let mut msg = RendezvousMessage::new();
+                        msg.set_punch_hole_response(PunchHoleResponse {
+                            failure: punch_hole_response::Failure::OFFLINE.into(),
+                            ..Default::default()
+                        });
+                        self.tx.send(Data::Msg(
+                            msg,
+                            addr,
+                        ))?;
+                    } else if self.pm.is_in_memory(&ph.id).await {
                         self.handle_udp_punch_hole_request(addr, ph, key).await?;
                     } else {
                         // not in memory, fetch from db with spawn in case blocking me
@@ -848,6 +859,14 @@ impl RendezvousServer {
             },
         ))?;
         Ok(())
+    }
+
+    #[inline]
+    async fn handle_check_allow_id_relay(
+        &mut self,
+        ph: PunchHoleRequest,
+    ) -> bool {
+        self.pm.is_allow_peer_relay(&ph.own_id).await
     }
 
     async fn check_ip_blocker(&self, ip: &str, id: &str) -> bool {

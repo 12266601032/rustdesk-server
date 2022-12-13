@@ -48,6 +48,12 @@ pub struct Peer {
     pub status: Option<i64>,
 }
 
+#[derive(Default)]
+pub struct AllowRelayList {
+    pub id: i32,
+
+}
+
 impl Database {
     pub async fn new(url: &str) -> ResultType<Database> {
         if !std::path::Path::new(url).exists() {
@@ -88,6 +94,21 @@ impl Database {
             create index if not exists index_peer_user on peer (user);
             create index if not exists index_peer_created_at on peer (created_at);
             create index if not exists index_peer_status on peer (status);
+        "
+        )
+        .execute(self.pool.get().await?.deref_mut())
+        .await?;
+        sqlx::query!(
+            "
+            create table if not exists allow_relay_list (
+                id integer PRIMARY KEY AUTOINCREMENT,
+                rust_id varchar(100) not null,
+                from_app varchar(100) not null,
+                app_user_id varchar(100) not null,
+                note varchar(300)
+            );
+            create unique index if not exists uniq_from_app_user on allow_relay_list (from_app, app_user_id);
+            create index if not exists idx_rust_id on allow_relay_list(rust_id);
         "
         )
         .execute(self.pool.get().await?.deref_mut())
@@ -162,6 +183,19 @@ impl Database {
         .await?;
         Ok(())
     }
+
+    pub async fn exists_relay_allow_list(
+        &self,
+        own_id: &str,
+    ) -> ResultType<bool> {
+        let count = sqlx::query_scalar!(
+            "select count(*) from allow_relay_list where rust_id=?",
+            own_id
+        )
+        .fetch_one(self.pool.get().await?.deref_mut())
+        .await?;
+        Ok(count > 0)
+    }
 }
 
 #[cfg(test)]
@@ -170,6 +204,21 @@ mod tests {
     #[test]
     fn test_insert() {
         insert();
+    }
+
+    #[test]
+    fn test_allow_id_relay() {
+        allow_id_relay();
+    }
+
+    #[tokio::main(flavor = "multi_thread")]
+    async fn allow_id_relay() {
+        let db = super::Database::new("test.sqlite3").await.unwrap();
+        let cloned = db.clone();
+
+        if let Ok(v) = cloned.exists_relay_allow_list("").await {
+            println!("is ok: {}", v)
+        }
     }
 
     #[tokio::main(flavor = "multi_thread")]
