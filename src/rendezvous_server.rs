@@ -402,18 +402,7 @@ impl RendezvousServer {
                     socket.send(&msg_out, addr).await?
                 }
                 Some(rendezvous_message::Union::PunchHoleRequest(ph)) => {
-                    // check id blacklist
-                    if !self.handle_check_allow_id_relay(ph.clone()).await {
-                        let mut msg = RendezvousMessage::new();
-                        msg.set_punch_hole_response(PunchHoleResponse {
-                            failure: punch_hole_response::Failure::OFFLINE.into(),
-                            ..Default::default()
-                        });
-                        self.tx.send(Data::Msg(
-                            msg,
-                            addr,
-                        ))?;
-                    } else if self.pm.is_in_memory(&ph.id).await {
+                    if self.pm.is_in_memory(&ph.id).await {
                         self.handle_udp_punch_hole_request(addr, ph, key).await?;
                     } else {
                         // not in memory, fetch from db with spawn in case blocking me
@@ -684,6 +673,8 @@ impl RendezvousServer {
             return Ok((msg_out, None));
         }
         let id = ph.id;
+        let own_id = ph.own_id;
+        log::info!("request id from {} to {}", own_id, id);
         // punch hole request from A, relay to B,
         // check if in same intranet first,
         // fetch local addrs if in same intranet.
@@ -702,6 +693,18 @@ impl RendezvousServer {
                 });
                 return Ok((msg_out, None));
             }
+
+            // check id blacklist
+            if !self.handle_check_allow_id_relay(&own_id).await {
+                let mut msg_out = RendezvousMessage::new();
+                msg_out.set_punch_hole_response(PunchHoleResponse {
+                    failure: punch_hole_response::Failure::OFFLINE.into(),
+                    ..Default::default()
+                });
+                return Ok((msg_out, None));
+            } 
+
+
             let mut msg_out = RendezvousMessage::new();
             let peer_is_lan = self.is_lan(peer_addr);
             let is_lan = self.is_lan(addr);
@@ -864,9 +867,9 @@ impl RendezvousServer {
     #[inline]
     async fn handle_check_allow_id_relay(
         &mut self,
-        ph: PunchHoleRequest,
+        own_id: &str,
     ) -> bool {
-        self.pm.is_allow_peer_relay(&ph.own_id).await
+        self.pm.is_allow_peer_relay(own_id).await
     }
 
     async fn check_ip_blocker(&self, ip: &str, id: &str) -> bool {
