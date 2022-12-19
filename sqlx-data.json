@@ -1,3 +1,161 @@
 {
-  "db": "MySQL"
+  "db": "MySQL",
+  "066c785019c89ef94cd6390be832c0d1223cf8a4b3bb3238b9d8a3aa57df1a8f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 5
+      }
+    },
+    "query": "insert into peer(guid, id, uuid, pk, info) values(?, ?, ?, ?, ?)"
+  },
+  "969c1e1197d649c811a56073260e35e6ae54bcd73b8b76d7372e188ad15d31f2": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 2
+      }
+    },
+    "query": "update peer set note = ? where guid = ?"
+  },
+  "ce42209914aa7ffc8a25cec156bdcad502e12e5b94fbf56f4468c49a44fb2021": {
+    "describe": {
+      "columns": [
+        {
+          "name": "count(*)",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 129
+            },
+            "max_size": 21,
+            "type": "LongLong"
+          }
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "select count(*) from allow_relay_list where rust_id=?"
+  },
+  "ecf94760cb1b29f8b72e840ef1be1c0d4fc6c00a0aa3fdef4704cb00c76a2877": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Right": 4
+      }
+    },
+    "query": "update peer set id=?, pk=?, info=? where guid=?"
+  },
+  "ee49c9f9b7195ecbd4ae35430b804d4db71a6232977674854b7cf18d7dc4565a": {
+    "describe": {
+      "columns": [
+        {
+          "name": "guid",
+          "ordinal": 0,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 4227
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "id",
+          "ordinal": 1,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4101
+            },
+            "max_size": 400,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "uuid",
+          "ordinal": 2,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "pk",
+          "ordinal": 3,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 4225
+            },
+            "max_size": 64,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "user",
+          "ordinal": 4,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 136
+            },
+            "max_size": 300,
+            "type": "VarString"
+          }
+        },
+        {
+          "name": "status",
+          "ordinal": 5,
+          "type_info": {
+            "char_set": 63,
+            "flags": {
+              "bits": 8
+            },
+            "max_size": 20,
+            "type": "LongLong"
+          }
+        },
+        {
+          "name": "info",
+          "ordinal": 6,
+          "type_info": {
+            "char_set": 224,
+            "flags": {
+              "bits": 4113
+            },
+            "max_size": 262140,
+            "type": "Blob"
+          }
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        true,
+        false
+      ],
+      "parameters": {
+        "Right": 1
+      }
+    },
+    "query": "select guid, id, uuid, pk, user, status, info from peer where id = ?"
+  }
 }
