@@ -1,0 +1,104 @@
+{
+  "query": "select guid, id, uuid, pk, user, status, info from peer where id = ?",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "guid",
+        "type_info": {
+          "type": "VarString",
+          "flags": {
+            "bits": 4227
+          },
+          "char_set": 63,
+          "max_size": 64
+        }
+      },
+      {
+        "ordinal": 1,
+        "name": "id",
+        "type_info": {
+          "type": "VarString",
+          "flags": {
+            "bits": 4101
+          },
+          "char_set": 224,
+          "max_size": 400
+        }
+      },
+      {
+        "ordinal": 2,
+        "name": "uuid",
+        "type_info": {
+          "type": "VarString",
+          "flags": {
+            "bits": 4225
+          },
+          "char_set": 63,
+          "max_size": 64
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "pk",
+        "type_info": {
+          "type": "VarString",
+          "flags": {
+            "bits": 4225
+          },
+          "char_set": 63,
+          "max_size": 64
+        }
+      },
+      {
+        "ordinal": 4,
+        "name": "user",
+        "type_info": {
+          "type": "VarString",
+          "flags": {
+            "bits": 136
+          },
+          "char_set": 63,
+          "max_size": 300
+        }
+      },
+      {
+        "ordinal": 5,
+        "name": "status",
+        "type_info": {
+          "type": "LongLong",
+          "flags": {
+            "bits": 8
+          },
+          "char_set": 63,
+          "max_size": 20
+        }
+      },
+      {
+        "ordinal": 6,
+        "name": "info",
+        "type_info": {
+          "type": "Blob",
+          "flags": {
+            "bits": 4113
+          },
+          "char_set": 224,
+          "max_size": 262140
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 1
+    },
+    "nullable": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false
+    ]
+  },
+  "hash": "ee49c9f9b7195ecbd4ae35430b804d4db71a6232977674854b7cf18d7dc4565a"
+}
