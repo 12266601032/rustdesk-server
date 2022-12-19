@@ -1,5 +1,5 @@
 use crate::common::*;
-use crate::database;
+use crate::database_mysql;
 use hbb_common::{
     log,
     rendezvous_proto::*,
@@ -59,7 +59,7 @@ pub(crate) type LockPeer = Arc<RwLock<Peer>>;
 #[derive(Clone)]
 pub(crate) struct PeerMap {
     map: Arc<RwLock<HashMap<String, LockPeer>>>,
-    pub(crate) db: database::Database,
+    pub(crate) db: database_mysql::Database,
 }
 
 impl PeerMap {
@@ -82,7 +82,7 @@ impl PeerMap {
         log::info!("DB_URL={}", db);
         let pm = Self {
             map: Default::default(),
-            db: database::Database::new(&db).await?,
+            db: database_mysql::Database::new(&db).await?,
         };
         Ok(pm)
     }
