@@ -60,6 +60,7 @@ pub(crate) type LockPeer = Arc<RwLock<Peer>>;
 pub(crate) struct PeerMap {
     map: Arc<RwLock<HashMap<String, LockPeer>>>,
     pub(crate) db: database_mysql::Database,
+    check_allow_relay: bool,
 }
 
 impl PeerMap {
@@ -80,9 +81,15 @@ impl PeerMap {
             db
         });
         log::info!("DB_URL={}", db);
+        let check_allow_relay: bool = std::env::var("CHECK_ALLOW_RELAY")
+            .unwrap_or("true".to_owned())
+            .parse()
+            .unwrap_or(true);
+        log::info!("CHECK_ALLOW_RELAY={}", check_allow_relay);
         let pm = Self {
             map: Default::default(),
             db: database_mysql::Database::new(&db).await?,
+            check_allow_relay: check_allow_relay,
         };
         Ok(pm)
     }
@@ -180,6 +187,9 @@ impl PeerMap {
 
     #[inline]
     pub(crate) async fn is_allow_peer_relay(&self, own_id: &str) -> bool {
+        if !self.check_allow_relay {
+            return true;
+        }
         if let Ok(exists) = self.db.exists_relay_allow_list(own_id).await {
            return exists;
         }
